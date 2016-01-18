@@ -1,3 +1,10 @@
+/**
+ * @author UCSD MOOC development team and YOU
+ * 
+ * A class which represents a path from one point/intersection to the other.
+ * Information for a path between two points.
+ *
+ */
 package roadgraph;
 
 import java.util.ArrayList;
@@ -9,16 +16,21 @@ import geography.GeographicPoint;
 
 public class RoadEdge {
 
+    //Starting point of the edge
     private GeographicPoint point1;
+    //Ending point of the edge
     private GeographicPoint point2;
     
-   
+    // Edge/Road name
     private String roadName;
+
+    // Edge Type
     private String roadType;
     
     // Length in km
     private double length;
     
+    //Constructor
     public RoadEdge(GeographicPoint pt1, GeographicPoint pt2, String roadName,
                         String roadType, double length)
     {

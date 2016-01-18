@@ -1,3 +1,12 @@
+/**
+ * @author UCSD MOOC development team and YOU
+ * 
+ * A class which represents an Intersection/Node.
+ * Information for the different nodes(basically it's location i.e. GeographicPoint) 
+ * added in the graph and the corresponding outgoing edges for each node.
+ *
+ */
+
 package roadgraph;
 
 import java.util.ArrayList;
@@ -6,13 +15,18 @@ import java.util.List;
 import geography.GeographicPoint;
 
 public class RoadNode {
+    //Location of the intersection/node
     private GeographicPoint location = null;
+
+    //Outgoing edges of the node
     private List<RoadEdge> edges = null;
     
+    //Constructor. Createds a new Road Node taking in a node and list of edges
     public RoadNode(GeographicPoint node, ArrayList<RoadEdge> nodeEdges) {
         setLocation(node);
         setEdges(nodeEdges);
     }
+
 
     public GeographicPoint getLocation() {
         return location;
@@ -26,6 +40,10 @@ public class RoadNode {
         return edges;
     }
 
+    /**
+     * Get the number of outgoing edges/paths from the current node/intersection
+     * @return The number of outgoing edges.
+     */
     public int getNumEdges() {
         if(edges == null) return 0;
         return edges.size();
@@ -75,7 +93,7 @@ public class RoadNode {
         return location.hashCode();
     }
     
-    // return road segment as String
+    // return road intersection location as String
     public String toString()
     {
         String toReturn = "Location: " + this.location;// + ", Edges:";

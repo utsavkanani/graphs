@@ -25,8 +25,11 @@ import util.GraphLoader;
  */
 public class MapGraph {
 	//TODO: Add your member variables here in WEEK 2
+	//Map of GeographicPoint to RoadNode in order to map geographic points
 	private Map<GeographicPoint, RoadNode> nodes = null;
+	// list of all edges in the graph
 	private List<RoadEdge> edges = null;
+	//This variable is used to maintain the list of neighbors for each GeographicPoint/node added to the graph.
 	private Map<GeographicPoint, ArrayList<GeographicPoint>> adjListsMap;
 
 	
