@@ -8,11 +8,12 @@
 package roadgraph;
 
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
 import geography.GeographicPoint;
+import geography.RoadSegment;
 import util.GraphLoader;
 
 /**
@@ -24,7 +25,10 @@ import util.GraphLoader;
  */
 public class MapGraph {
 	//TODO: Add your member variables here in WEEK 2
-	
+	private Map<GeographicPoint, RoadNode> nodes = null;
+	private List<RoadEdge> edges = null;
+	private Map<GeographicPoint, ArrayList<GeographicPoint>> adjListsMap;
+
 	
 	/** 
 	 * Create a new empty MapGraph 
@@ -32,6 +36,9 @@ public class MapGraph {
 	public MapGraph()
 	{
 		// TODO: Implement in this constructor in WEEK 2
+	    nodes = new HashMap<GeographicPoint, RoadNode>();
+	    edges = new ArrayList<RoadEdge>();
+	    adjListsMap = new HashMap<GeographicPoint, ArrayList<GeographicPoint>>();
 	}
 	
 	/**
@@ -41,7 +48,7 @@ public class MapGraph {
 	public int getNumVertices()
 	{
 		//TODO: Implement this method in WEEK 2
-		return 0;
+		return nodes != null ? nodes.size() : 0;
 	}
 	
 	/**
@@ -50,8 +57,12 @@ public class MapGraph {
 	 */
 	public Set<GeographicPoint> getVertices()
 	{
+	    Set<GeographicPoint> result = new HashSet<GeographicPoint>();
 		//TODO: Implement this method in WEEK 2
-		return null;
+	    for(RoadNode node : nodes.values()) {
+	        result.add(node.getLocation());
+	    }
+	    return result;
 	}
 	
 	/**
@@ -61,7 +72,7 @@ public class MapGraph {
 	public int getNumEdges()
 	{
 		//TODO: Implement this method in WEEK 2
-		return 0;
+		return edges != null ? edges.size() : 0;
 	}
 
 	
@@ -76,7 +87,16 @@ public class MapGraph {
 	public boolean addVertex(GeographicPoint location)
 	{
 		// TODO: Implement this method in WEEK 2
-		return false;
+	    if(location == null || nodes.containsKey(location))
+	        return false;
+	    else {
+	        RoadNode tmp = new RoadNode (location, new ArrayList<RoadEdge>());
+	        nodes.put(location, tmp);
+	        ArrayList<GeographicPoint> neighbors = new ArrayList<GeographicPoint>();
+	        adjListsMap.put(location,  neighbors);
+	        return true;
+	    }
+
 	}
 	
 	/**
@@ -95,6 +115,15 @@ public class MapGraph {
 			String roadType, double length) throws IllegalArgumentException {
 
 		//TODO: Implement this method in WEEK 2
+		if(null == from || null == to || null == roadName || null == roadType 
+		        || length < 0 || !nodes.containsKey(from) 
+		        || !nodes.containsKey(to))
+		    throw new IllegalArgumentException("Either points have not already been added as nodes to "
+		            + "the graph or one of the  the arguments is null or length is less than 0.");
+		RoadEdge tmpEdge = new RoadEdge(from, to, roadName, roadType, length);
+		edges.add(tmpEdge);
+		nodes.get(from).addEdge(tmpEdge);
+	    (adjListsMap.get(from)).add(to);
 		
 	}
 	
@@ -124,13 +153,54 @@ public class MapGraph {
 			 					     GeographicPoint goal, Consumer<GeographicPoint> nodeSearched)
 	{
 		// TODO: Implement this method in WEEK 2
+		Set<GeographicPoint> visited = new HashSet<GeographicPoint>();
+		Queue<GeographicPoint> searchQueue = new LinkedBlockingQueue<GeographicPoint>();
+		Map<GeographicPoint, GeographicPoint> parentMap = new HashMap<GeographicPoint, GeographicPoint>();
+		LinkedList<GeographicPoint> result = new LinkedList<GeographicPoint>();
+		if(null == start || null == goal) throw new IllegalArgumentException();
+		
+		searchQueue.add(start);
+        visited.add(start);
+        GeographicPoint curr = null;
+		
+		while(!searchQueue.isEmpty()) {
+		    curr = searchQueue.remove();
+		    nodeSearched.accept(curr);
+		    if(curr.equals(goal)) break;
+		    for(GeographicPoint neighbor :getUnvisitedNeighbors(curr, visited)) {
+		        visited.add(neighbor);
+		        searchQueue.add(neighbor);
+		        parentMap.put(neighbor, curr);
+		        
+		    }
+		      
+		}
+		
+		if(curr == null || !curr.equals(goal)) return null;
+		
+		for(GeographicPoint node = goal; node != null; node = parentMap.get(node)) {
+		    result.push(node);
+		}
+		
+		return result;
 		
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
 
-		return null;
 	}
 	
+	
+	private List<GeographicPoint> getUnvisitedNeighbors(GeographicPoint node, Set<GeographicPoint>visited) {
+	    List<GeographicPoint> result = new ArrayList<GeographicPoint>();
+	    for(GeographicPoint n : this.adjListsMap.get(node)) {
+	        if(!visited.contains(n)) {
+	            result.add(n);
+	        }
+	    }
+	    
+	    return result;
+	    
+	}
 
 	/** Find the path from start to goal using Dijkstra's algorithm
 	 * 
